@@ -72,11 +72,28 @@ end
 class Human
     attr_reader :name
 
-    attr_accessor :roleinthisturn
+    attr_accessor :roleinthisturn, :score
 
     def initialize(name)
       @name = name
       @roleinthisturn = nil
+      @score = 0
+    end
+
+    def human_sets_code
+
+    end
+
+    def inputcodeorguess(string)
+        entered = string 
+          until entered.upcase.scan(REGEX_COLOURS).size >= 4
+            puts "Not accepted. Please type four colour characters, choosing from #{PEG_COLOURS}."
+            entered = gets
+          end
+        array = entered.upcase.scan(REGEX_COLOURS).slice(0,4)
+        # returns the first four input characters that match the possible colours
+        # which is a valid code for setting a code or a valid guess
+
     end
 end
 
@@ -84,11 +101,12 @@ end
 class Computer
    attr_reader :name
 
-   attr_accessor :roleinthisturn
+   attr_accessor :roleinthisturn, :score
    
    def initialize  
      @name = 'computer'
      @roleinthisturn = nil
+     @score = 0
    end
 end
 
