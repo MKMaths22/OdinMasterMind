@@ -62,6 +62,15 @@ class Computer
      @roleinthisturn = nil
      @score = 0
    end
+
+  def randomcodeorguess
+    output = []
+    4.times do
+        output.push(PEG_COLOURS[rand(PEG_COLOURS.size)])
+    end
+    output
+  end
+
 end
 
 # TurnProgress class keeps track of how many guesses so far in the turn and knows when it is over
@@ -161,6 +170,11 @@ game_controller = GameProgress.new(0)
   end
 # game_controller is initialised with the parity value 0 or 1 dependining on what the roles are in turn 1
 # the GameProgress class automatically starts the game_controller.turn_number at 1
+
+p computer_player.randomcodeorguess
+p computer_player.randomcodeorguess
+
+
 
 
   
