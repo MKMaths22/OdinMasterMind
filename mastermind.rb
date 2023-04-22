@@ -39,11 +39,11 @@ include GameConstants
     end
 
     def make_code
-        make_code_or_guess if self.codemaker 
+        self.codemaker ? make_code_or_guess : [] 
     end
 
     def make_guess 
-        make_code_or_guess if self.codebreaker 
+        self.codebreaker ? make_code_or_guess : []
     end 
 
     # context will determine whether we are asking for a code or guess. The algorithm will ask a Human or 
@@ -52,9 +52,10 @@ include GameConstants
     private 
     
     def make_code_or_guess
+        puts "Enter four colours from #{PEG_COLOURS}. Duplicates allowed."
         entered = gets 
           until entered.upcase.scan(REGEX_COLOURS).size >= 4
-            puts "Not accepted. Please type four colour characters, choosing from #{PEG_COLOURS}."
+            puts "Not accepted. Please type four colour characters, choosing from #{PEG_COLOURS}. Duplicates allowed."
             entered = gets
           end
         array = entered.upcase.scan(REGEX_COLOURS).slice(0,4)
@@ -79,11 +80,11 @@ class Computer
    end
 
   def make_code
-    make_random_code_or_guess if self.codemaker
+    self.codemaker ? make_random_code_or_guess : []
   end
 
   def make_guess
-    make_random_code_or_guess if self.codebreaker
+    self.breaker ? make_random_code_or_guess : []
     # when the program is rewritten to give Computer a clever strategy, this method will be fleshed out
   end
 
@@ -228,7 +229,8 @@ feedback_display = FeedbackDisplayer.new
 
 until game_controller.turn_number == TURNS do
     game_controller.start_new_turn
-    turn_controller.code = 
+    turn_controller.code = computer_player.make_code.concat(human_player.make_code)
+    p turn_controller.code
     # increments the turn number
     # the roles of human_player and computer_player start off correctly so they must be
     # changed at THE END of a turn to be correct for the next one
