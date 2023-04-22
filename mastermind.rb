@@ -52,6 +52,8 @@ include GameConstants
     private 
     
     def make_code_or_guess
+        puts "Last guess now. Good luck!" if self.codebreaker && turn_controller.current_guess = MAX_GUESSES
+        puts "Let's hope the computer can't crack this." if self.codemaker
         puts "Enter four colours from #{PEG_COLOURS}. Duplicates allowed."
         entered = gets 
           until entered.upcase.scan(REGEX_COLOURS).size >= 4
@@ -84,13 +86,16 @@ class Computer
   end
 
   def make_guess
-    self.breaker ? make_random_code_or_guess : []
+    self.codebreaker ? make_random_code_or_guess : []
     # when the program is rewritten to give Computer a clever strategy, this method will be fleshed out
   end
 
   private
 
   def make_random_code_or_guess
+    puts "computer thinking..."
+    sleep(3)
+    # to slow down the computer
     output = []
       4.times do
         output.push(PEG_COLOURS[rand(PEG_COLOURS.size)])
@@ -230,13 +235,20 @@ feedback_display = FeedbackDisplayer.new
 until game_controller.turn_number == TURNS do
     game_controller.start_new_turn
     turn_controller.code = computer_player.make_code.concat(human_player.make_code)
-    p turn_controller.code
     # increments the turn number
     # the roles of human_player and computer_player start off correctly so they must be
     # changed at THE END of a turn to be correct for the next one
+    # also at the end the feedback display should be wiped
     until turn_controller.guesses_so_far == MAX_GUESSES do
           turn_controller.start_new_guess
           # increments the guesses_so_far number
+          current_guess = computer_player.make_guess.concat(human_player.make_guess)
+          # current_guess is an array
+          current_feedback_array = feedback_giver.feedback(turn_controller.code, current_guess)
+          #feedback_array is an array
+          current_feedback_string = feedback_display.array_to_string(current_guess, current_feedback_array)
+          feedback_display.add_the_feedback(current_feedback_string)
+          puts "The total feedback so far is: \n #{feedback_display.total_feedback}"
     end
 end 
 
