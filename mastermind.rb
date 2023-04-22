@@ -98,10 +98,17 @@ end
 class TurnProgress
     
   include GameConstants
+
+  attr_accessor :code, :guesses_so_far
   
   def initialize
     @code = nil
-  end  
+    @guesses_so_far = 0
+  end
+  
+  def start_new_guess
+    self.guesses_so_far += 1
+  end
 end 
 
 # One game consists of an even number of turns, so that both sides set codes and guess codes
@@ -113,8 +120,13 @@ class GameProgress
     attr_accessor :turn_number
     
     def initialize
-      @turn_number = 1
+      @turn_number = 0
+      # starts at zero so that at the start of a turn it is the number of completed turns/rounds
     end 
+
+    def start_new_turn
+        self.turn_number += 1
+    end
 
 end
 
@@ -169,6 +181,10 @@ class FeedbackDisplayer
         self.total_feedback += one_guess_output
     end
 
+    def reset_the_feedback
+        self.total_feedback = ""
+    end
+
     def array_to_string(guess_array,feedback_array)
         # format for output after a guess: puts [ 'Guess: A B C D  feedback: Red, White.']
         guess_string = "Guess: " + guess_array.join(' ')
@@ -196,11 +212,24 @@ human_player.codebreaker = true
 computer_player.codemaker = true
   end
 
-# the GameProgress class automatically starts the game_controller.turn_number at 1
+# the GameProgress class automatically starts the game_controller.turn_number at 0
+# and this is incremented at the beginning of each turn. Similarly the TurnProgress class
+# starts with guesses_so_far at 0 and increments it at the start of a guess
 game_controller = GameProgress.new
+turn_controller = TurnProgress.new
+feedback_giver = FeedbackProvider.new
+feedback_display = FeedbackDisplayer.new
 
-p human_player
-p computer_player
+
+until game_controller.turn_number == TURNS do
+    game_controller.start_new_turn
+    # increments the turn number
+    # the roles of human_player and computer_player start off correctly so they must be
+    # changed at THE END of a turn to be correct for the next one
+    turn_controller = 
+end 
+
+
 
 
 
