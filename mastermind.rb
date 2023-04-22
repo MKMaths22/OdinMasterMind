@@ -29,16 +29,28 @@ include GameConstants
 
     attr_reader :name
 
-    attr_accessor :roleinthisturn, :score
+    attr_accessor :role_in_this_turn, :score
 
     def initialize(name)
       @name = name
-      @roleinthisturn = nil
+      @role_in_this_turn = nil
       @score = 0
     end
 
-    def inputcodeorguess(string)
-        entered = string 
+    def make_code
+        make_code_or_guess
+    end
+
+    def make_guess 
+        make_code_or_guess
+    end 
+
+    # context will determine whether we are asking for a code or guess. The algorithm will ask a Human or 
+    # Computer to make a code or guess without knowing which player type is being asked. So even though
+    # the methods are identical for a Human, they still have different names.
+    
+    def make_code_or_guess
+        entered = gets 
           until entered.upcase.scan(REGEX_COLOURS).size >= 4
             puts "Not accepted. Please type four colour characters, choosing from #{PEG_COLOURS}."
             entered = gets
@@ -55,20 +67,26 @@ class Computer
   include GameConstants
    attr_reader :name
 
-   attr_accessor :roleinthisturn, :score
+   attr_accessor :role_in_this_turn, :score
    
    def initialize  
      @name = 'computer'
-     @roleinthisturn = nil
+     @role_in_this_turn = nil
      @score = 0
    end
 
-  def randomcodeorguess
+  def make_code
     output = []
     4.times do
         output.push(PEG_COLOURS[rand(PEG_COLOURS.size)])
     end
     output
+  end
+
+  def make_guess
+    make_code
+    # when the program is rewritten to give Computer a clever strategy, this method will be fleshed out
+    # so it is distinct from make_code even though it does exactly the same thing
   end
 
 end
@@ -140,10 +158,23 @@ end
 # FeedbackDisplayer class maintains the feedback display for an entire turn based on guesses and
 # feedback so far, so we can see the whole history of trying to crack the code
 class FeedbackDisplayer
-    def arraytostring(guess_array,feedback_array)
+    
+    attr_accessor :total_feedback
+    
+    def initialize
+        @total_feedback = ""
+        #tracks the total feedback so far in the current turn/round as a string
+    end
+
+    def display_the_feedback(one_guess_output)
+        self.total_feedback += one_guess_output
+        puts total_feedback
+    end
+
+    def array_to_string(guess_array,feedback_array)
         # format for output after a guess: puts [ 'Guess: A B C D  feedback: Red, White.']
         guess_string = "Guess: " + guess_array.join(' ')
-        feedback_string = "  feedback: #{feedback_array.compact.join(', ')}."
+        feedback_string = "  feedback: #{feedback_array.compact.join(', ')}. \n"
         guess_string + feedback_string
     end
 end
@@ -160,19 +191,17 @@ inputted = gets.strip.upcase
   end
 decision = inputted.scan(THISREGEX)[0]
   if decision == 'M'
-human_player.roleinthisturn = 'codemaker'
-computer_player.roleinthisturn = 'codebreaker'
+human_player.role_in_this_turn = 'codemaker'
+computer_player.role_in_this_turn = 'codebreaker'
 game_controller = GameProgress.new(1)
   else
-human_player.roleinthisturn = 'codebreaker'
-computer_player.roleinthisturn = 'codemaker'
+human_player.role_in_this_turn = 'codebreaker'
+computer_player.role_in_this_turn = 'codemaker'
 game_controller = GameProgress.new(0)
   end
 # game_controller is initialised with the parity value 0 or 1 dependining on what the roles are in turn 1
 # the GameProgress class automatically starts the game_controller.turn_number at 1
 
-p computer_player.randomcodeorguess
-p computer_player.randomcodeorguess
 
 
 
