@@ -29,11 +29,12 @@ include GameConstants
 
     attr_reader :name
 
-    attr_accessor :role_in_this_turn, :score
+    attr_accessor :codebreaker, :codemaker, :score
 
     def initialize(name)
       @name = name
-      @role_in_this_turn = nil
+      @codebreaker = false
+      @codemaker = false
       @score = 0
     end
 
@@ -48,6 +49,7 @@ include GameConstants
     # context will determine whether we are asking for a code or guess. The algorithm will ask a Human or 
     # Computer to make a code or guess without knowing which player type is being asked. So even though
     # the methods are identical for a Human, they still have different names.
+    private 
     
     def make_code_or_guess
         entered = gets 
@@ -67,11 +69,12 @@ class Computer
   include GameConstants
    attr_reader :name
 
-   attr_accessor :role_in_this_turn, :score
+   attr_accessor :codemaker, :codebreaker, :score
    
    def initialize  
      @name = 'computer'
-     @role_in_this_turn = nil
+     @codemaker = false
+     @codebreaker = false
      @score = 0
    end
 
@@ -106,14 +109,10 @@ end
 class GameProgress
 
     include GameConstants
-    
-    attr_reader :parity
+
     attr_accessor :turn_number
     
-    def initialize(parity)
-      # parity = integer 0 or 1. Parity 0 means Human breaks code in the first turn/round 
-      # and all odd turns/rounds. Parity 1 means the Computer breaks code in all odd turns/rounds
-      @parity = parity
+    def initialize
       @turn_number = 1
     end 
 
@@ -166,9 +165,8 @@ class FeedbackDisplayer
         #tracks the total feedback so far in the current turn/round as a string
     end
 
-    def display_the_feedback(one_guess_output)
+    def add_the_feedback(one_guess_output)
         self.total_feedback += one_guess_output
-        puts total_feedback
     end
 
     def array_to_string(guess_array,feedback_array)
@@ -191,16 +189,18 @@ inputted = gets.strip.upcase
   end
 decision = inputted.scan(THISREGEX)[0]
   if decision == 'M'
-human_player.role_in_this_turn = 'codemaker'
-computer_player.role_in_this_turn = 'codebreaker'
-game_controller = GameProgress.new(1)
+human_player.codemaker = true 
+computer_player.codebreaker = true
   else
-human_player.role_in_this_turn = 'codebreaker'
-computer_player.role_in_this_turn = 'codemaker'
-game_controller = GameProgress.new(0)
+human_player.codebreaker = true 
+computer_player.codemaker = true
   end
-# game_controller is initialised with the parity value 0 or 1 dependining on what the roles are in turn 1
+
 # the GameProgress class automatically starts the game_controller.turn_number at 1
+game_controller = GameProgress.new
+
+p human_player
+p computer_player
 
 
 
