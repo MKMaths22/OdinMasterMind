@@ -3,7 +3,7 @@
 # Initially I will code the function that gives feedback when a guess is made by the codebreaker
 # The colours will be represented by an array
 module GameConstants 
-  PEG_COLOURS = %w[A B C D E F].freeze
+  PEG_COLOURS = %w[A B].freeze
   REGEX_COLOURS = Regexp.union(PEG_COLOURS)
   MAX_GUESSES = 12
   # the maximum number of guesses in a turn
@@ -52,7 +52,6 @@ include GameConstants
     private 
     
     def make_code_or_guess
-        puts "Last guess now. Good luck!" if self.codebreaker && turn_controller.current_guess = MAX_GUESSES
         puts "Let's hope the computer can't crack this." if self.codemaker
         puts "Enter four colours from #{PEG_COLOURS}. Duplicates allowed."
         entered = gets 
@@ -110,15 +109,22 @@ class TurnProgress
     
   include GameConstants
 
-  attr_accessor :code, :guesses_so_far
+  attr_accessor :code, :guesses_so_far, :code_solved
   
   def initialize
     @code = nil
     @guesses_so_far = 0
+    @code_solved = false
   end
   
   def start_new_guess
     self.guesses_so_far += 1
+  end
+
+  def congratulate
+  # congratulates the Human or commisserates if the computer won
+  puts "The code was solved"
+  # and updates the scoring too
   end
 end 
 
@@ -242,10 +248,17 @@ until game_controller.turn_number == TURNS do
     until turn_controller.guesses_so_far == MAX_GUESSES do
           turn_controller.start_new_guess
           # increments the guesses_so_far number
+          puts "Last guess now. Good luck!" if human_player.codebreaker && turn_controller.guesses_so_far == MAX_GUESSES
           current_guess = computer_player.make_guess.concat(human_player.make_guess)
           # current_guess is an array
           current_feedback_array = feedback_giver.feedback(turn_controller.code, current_guess)
-          #feedback_array is an array
+          if current_feedback_array[3] == HINT_COLOURS[0]
+            turn_controller.code_solved = true
+            turn_controller.congratulate
+          end 
+          break if turn_controller.code_solved 
+          # the code was guessed correctly
+          # feedback_array is an array
           current_feedback_string = feedback_display.array_to_string(current_guess, current_feedback_array)
           feedback_display.add_the_feedback(current_feedback_string)
           puts "The total feedback so far is: \n #{feedback_display.total_feedback}"
