@@ -39,16 +39,16 @@ include GameConstants
     end
 
     def make_code
-        make_code_or_guess
+        make_code_or_guess if self.codemaker 
     end
 
     def make_guess 
-        make_code_or_guess
+        make_code_or_guess if self.codebreaker 
     end 
 
     # context will determine whether we are asking for a code or guess. The algorithm will ask a Human or 
-    # Computer to make a code or guess without knowing which player type is being asked. So even though
-    # the methods are identical for a Human, they still have different names.
+    # Computer to make a code or guess without knowing which player type is being asked. So if they are asked
+    # the wrong thing, they will return nil
     private 
     
     def make_code_or_guess
@@ -79,18 +79,23 @@ class Computer
    end
 
   def make_code
-    output = []
-    4.times do
-        output.push(PEG_COLOURS[rand(PEG_COLOURS.size)])
-    end
-    output
+    make_random_code_or_guess if self.codemaker
   end
 
   def make_guess
-    make_code
+    make_random_code_or_guess if self.codebreaker
     # when the program is rewritten to give Computer a clever strategy, this method will be fleshed out
-    # so it is distinct from make_code even though it does exactly the same thing
   end
+
+  private
+
+  def make_random_code_or_guess
+    output = []
+      4.times do
+        output.push(PEG_COLOURS[rand(PEG_COLOURS.size)])
+      end
+      output
+  end 
 
 end
 
@@ -223,10 +228,14 @@ feedback_display = FeedbackDisplayer.new
 
 until game_controller.turn_number == TURNS do
     game_controller.start_new_turn
+    turn_controller.code = 
     # increments the turn number
     # the roles of human_player and computer_player start off correctly so they must be
     # changed at THE END of a turn to be correct for the next one
-    turn_controller = 
+    until turn_controller.guesses_so_far == MAX_GUESSES do
+          turn_controller.start_new_guess
+          # increments the guesses_so_far number
+    end
 end 
 
 
