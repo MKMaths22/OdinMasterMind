@@ -3,7 +3,7 @@
 # Initially I will code the function that gives feedback when a guess is made by the codebreaker
 # The colours will be represented by an array
 module GameConstants 
-  PEG_COLOURS = %w[A B].freeze
+  PEG_COLOURS = %w[A].freeze
   REGEX_COLOURS = Regexp.union(PEG_COLOURS)
   MAX_GUESSES = 12
   # the maximum number of guesses in a turn
@@ -15,6 +15,10 @@ module GameConstants
   # The first colour is for correct colour and position, second one for colour correct but in wrong position
   # The Code is an array of four peg_colours, as is the guess. Feedback is given as an array of length 4,
   # starting with the Hint_Colours pegs and completed with nil values
+  def point_or_points(num)
+    num == 1 ? "1 point" : "#{num} points"
+  end
+  # point_or_s makes sure that the singular 'point' is displayed when necessary
 end
 
 include GameConstants 
@@ -150,6 +154,9 @@ class GameProgress
 
     def start_new_turn
         self.turn_number += 1
+        sleep(2)
+        puts "\n This is the start of Round number #{self.turn_number}." if self.turn_number.between?(2,TURNS - 1)
+        puts "\n And finally, Round number #{TURNS}" if self.turn_number == TURNS
     end
 
 end
@@ -247,7 +254,7 @@ feedback_display = FeedbackDisplayer.new
 
 until game_controller.turn_number == TURNS do
     game_controller.start_new_turn
-    turn_controller.code = computer_player.make_code.concat(human_player.make_code)
+    turn_controller.code = computer_player.make_code.concat(human_player.make_code) 
     # increments the turn number
     # the roles of human_player and computer_player start off correctly so they must be
     # changed at THE END of a turn to be correct for the next one
@@ -268,8 +275,8 @@ until game_controller.turn_number == TURNS do
             puts "The total feedback for the guesses was: \n #{feedback_display.total_feedback}"
             human_player.score += turn_controller.guesses_so_far if human_player.codemaker
             computer_player.score += turn_controller.guesses_so_far if computer_player.codemaker
-            puts "The scores are now: #{human_player.name} has #{human_player.score} points and \n
-            the computer has #{computer_player.score} points."
+            puts "The scores are now: #{human_player.name} has #{point_or_points(human_player.score)} and \n
+            the computer has #{point_or_points(computer_player.score)}"
           end 
           break if turn_controller.code_solved 
           # the code was guessed correctly
@@ -285,8 +292,8 @@ until game_controller.turn_number == TURNS do
       else
         computer_player.score += (MAX_GUESSES + 1)
       end
-      puts "The scores are now: #{human_player.name} has #{human_player.score} points and \n
-            the computer has #{computer_player.score} points."
+      puts "The scores are now: #{human_player.name} has #{point_or_points(human_player.score)} and \n
+            the computer has #{point_or_points(computer_player.score)}"
     end
 
     human_player.toggle_role
@@ -300,12 +307,12 @@ end
 puts "The game is over. Here are the scores..."
 sleep(2)
 if human_player.score > computer_player.score
-    puts "Congratulations, #{human_player.name}! You won by #{human_player.score} points to #{computer_player.score}."
+    puts "Congratulations, #{human_player.name}! You won by #{point_or_points(human_player.score)} to #{computer_player.score}."
 elsif human_player.score < computer_player.score
-    puts "The computer wins the game by #{computer_player.score} points to #{human_player.score}. \n
+    puts "The computer wins the game by #{point_or_points(computer_player.score)} to #{human_player.score}. \n
     Better luck next time, #{human_player.name}"
 else 
-    puts "The game is drawn --- both players scored #{human_player.score} points."
+    puts "The game is drawn --- both players scored #{point_or_points(human_player.score)}"
 end 
 
 
