@@ -3,7 +3,7 @@
 # Initially I will code the function that gives feedback when a guess is made by the codebreaker
 # The colours will be represented by an array
 module GameConstants 
-  PEG_COLOURS = %w[A].freeze
+  PEG_COLOURS = %w[A B C D E F].freeze
   REGEX_COLOURS = Regexp.union(PEG_COLOURS)
   MAX_GUESSES = 12
   # the maximum number of guesses in a turn
@@ -219,7 +219,11 @@ class FeedbackDisplayer
     def array_to_string(guess_array,feedback_array)
         # format for output after a guess: puts [ 'Guess: A B C D  feedback: Red, White.']
         guess_string = "Guess: " + guess_array.join(' ')
-        feedback_string = "  feedback: #{feedback_array.compact.join(', ')}. \n"
+        stringy_feedback = feedback_array.compact.join(', ')
+        if stringy_feedback == ''
+             feedback_string = " feedback: No matches. \n"
+        else feedback_string = "  feedback: #{feedback_array.compact.join(', ')}. \n"
+        end 
         guess_string + feedback_string
     end
 end
