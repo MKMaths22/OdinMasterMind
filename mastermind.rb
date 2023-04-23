@@ -289,7 +289,7 @@ until game_controller.turn_number == TURNS do
     end
     # here is the code that executes if all guesses have been used up in the turn/round
     unless turn_controller.code_solved 
-      puts "The code has not been cracked in #{MAX_GUESSES} guesses, so the codemaker scores #{MAX_GUESSES + 1} points."
+      puts "The code #{turn_controller.code} has not been cracked in #{MAX_GUESSES} guesses, so the codemaker scores #{MAX_GUESSES + 1} points."
       if human_player.codemaker
         human_player.score += (MAX_GUESSES + 1)
         puts "That's a good round, #{human_player.name}."
