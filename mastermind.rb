@@ -7,7 +7,7 @@ module GameConstants
   REGEX_COLOURS = Regexp.union(PEG_COLOURS)
   MAX_GUESSES = 12
   # the maximum number of guesses in a turn
-  TURNS = 2
+  TURNS = 4
   # the number of turns in one game, an even number
   # 6 possible peg colours and 12 guesses allowed for the codebreaker
   # string to array method assumes that the peg colours are all uppercase letters
@@ -36,6 +36,11 @@ include GameConstants
       @codebreaker = false
       @codemaker = false
       @score = 0
+    end
+
+    def toggle_role
+        self.codemaker = !@codemaker
+        self.codebreaker = !@codebreaker
     end
 
     def make_code
@@ -79,7 +84,13 @@ class Computer
      @codebreaker = false
      @score = 0
    end
-
+  
+  def toggle_role
+    self.codemaker = !@codemaker
+    self.codebreaker = !@codebreaker
+  end
+  
+  
   def make_code
     self.codemaker ? make_random_code_or_guess : []
   end
@@ -119,12 +130,6 @@ class TurnProgress
   
   def start_new_guess
     self.guesses_so_far += 1
-  end
-
-  def congratulate
-  # congratulates the Human or commisserates if the computer won
-  puts "The code was solved"
-  # and updates the scoring too
   end
 end 
 
@@ -252,17 +257,53 @@ until game_controller.turn_number == TURNS do
           current_guess = computer_player.make_guess.concat(human_player.make_guess)
           # current_guess is an array
           current_feedback_array = feedback_giver.feedback(turn_controller.code, current_guess)
+          current_feedback_string = feedback_display.array_to_string(current_guess, current_feedback_array)
+          feedback_display.add_the_feedback(current_feedback_string)
           if current_feedback_array[3] == HINT_COLOURS[0]
             turn_controller.code_solved = true
-            turn_controller.congratulate
+            puts "You solved it. Well done, #{human_player.name}!" if human_player.codebreaker
+            puts "The computer solved your code." if computer_player.codebreaker
+            puts "The total feedback for the guesses was: \n #{feedback_display.total_feedback}"
+            human_player.score += turn_controller.guesses_so_far if human_player.codemaker
+            computer_player.score += turn_controller.guesses_so_far if computer_player.codemaker
+            puts "The scores are now: #{human_player.name} has #{human_player.score} points and \n
+            the computer has #{computer_player.score} points."
           end 
           break if turn_controller.code_solved 
           # the code was guessed correctly
           # feedback_array is an array
-          current_feedback_string = feedback_display.array_to_string(current_guess, current_feedback_array)
-          feedback_display.add_the_feedback(current_feedback_string)
           puts "The total feedback so far is: \n #{feedback_display.total_feedback}"
     end
+    # here is the code that executes if all guesses have been used up in the turn/round
+    unless turn_controller.code_solved 
+      puts "The code has not been cracked in #{MAX_GUESSES} guesses, so the codemaker scores #{MAX_GUESSES + 1} points."
+      if human_player.codemaker
+        human_player.score += (MAX_GUESSES + 1)
+        puts "That's a good round, #{human_player.name}."
+      else
+        computer_player.score += (MAX_GUESSES + 1)
+      end
+      puts "The scores are now: #{human_player.name} has #{human_player.score} points and \n
+            the computer has #{computer_player.score} points."
+    end
+
+    human_player.toggle_role
+    computer_player.toggle_role
+    feedback_display.reset_the_feedback
+    turn_controller.code_solved = false
+    turn_controller.guesses_so_far = 0
+    
+end
+
+puts "The game is over. Here are the scores..."
+sleep(2)
+if human_player.score > computer_player.score
+    puts "Congratulations, #{human_player.name}! You won by #{human_player.score} points to #{computer_player.score}."
+elsif human_player.score < computer_player.score
+    puts "The computer wins the game by #{computer_player.score} points to #{human_player.score}. \n
+    Better luck next time, #{human_player.name}"
+else 
+    puts "The game is drawn --- both players scored #{human_player.score} points."
 end 
 
 
