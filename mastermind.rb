@@ -58,6 +58,7 @@ include GameConstants
     
     def make_code_or_guess
         puts "Let's hope the computer can't crack this." if self.codemaker
+        puts "Guess the code." if self.codebreaker
         puts "Enter four colours from #{PEG_COLOURS}. Duplicates allowed."
         entered = gets 
           until entered.upcase.scan(REGEX_COLOURS).size >= 4
