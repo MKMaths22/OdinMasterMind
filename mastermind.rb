@@ -103,7 +103,8 @@ class Computer
   private
 
   def make_random_code_or_guess
-    puts "computer thinking..."
+    puts "computer guessing..." if self.codebreaker
+    puts "computer setting code..." if self.codemaker
     sleep(3)
     # to slow down the computer
     output = []
