@@ -263,20 +263,20 @@ feedback_display = FeedbackDisplayer.new
 
 until game_controller.turn_number == TURNS do
     game_controller.start_new_turn
-    turn_controller.code = computer_player.make_code.concat(human_player.make_code) 
     # increments the turn number
-    # the roles of human_player and computer_player start off correctly so they must be
-    # changed at THE END of a turn to be correct for the next one
-    # also at the end the feedback display should be wiped
+    turn_controller.code = computer_player.make_code.concat(human_player.make_code)
+    # whichever player is codebreaker supplies empty array for making code so concat works
+
     until turn_controller.guesses_so_far == MAX_GUESSES do
           turn_controller.start_new_guess
           # increments the guesses_so_far number
           puts "Last guess now. Good luck!" if human_player.codebreaker && turn_controller.guesses_so_far == MAX_GUESSES
           current_guess = computer_player.make_guess.concat(human_player.make_guess)
-          # current_guess is an array
+          # current_guess is an array and whichever player is codemaker supplies empty array so concat works
           current_feedback_array = feedback_giver.feedback(turn_controller.code, current_guess)
           current_feedback_string = feedback_display.array_to_string(current_guess, current_feedback_array)
           feedback_display.add_the_feedback(current_feedback_string)
+          
           if current_feedback_array[3] == HINT_COLOURS[0]
             turn_controller.code_solved = true
             puts "You solved it. Well done, #{human_player.name}!" if human_player.codebreaker
@@ -289,7 +289,6 @@ until game_controller.turn_number == TURNS do
           end 
           break if turn_controller.code_solved 
           # the code was guessed correctly
-          # feedback_array is an array
           puts "The total feedback so far is: \n #{feedback_display.total_feedback}"
     end
     # here is the code that executes if all guesses have been used up in the turn/round
