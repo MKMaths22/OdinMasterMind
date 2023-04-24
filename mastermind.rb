@@ -4,21 +4,20 @@
 # The colours will be represented by an array
 module GameConstants 
   PEG_COLOURS = %w[A B C D E F].freeze
+  # the code does not assume there are six colours, this can be adjusted to any number of single letters
+  # make_code_or_guess method in Human class assumes that the peg colours are all uppercase letters
   REGEX_COLOURS = Regexp.union(PEG_COLOURS)
   MAX_GUESSES = 12
   # the maximum number of guesses in a turn
   TURNS = 4
   # the number of turns in one game, an even number
-  # 6 possible peg colours and 12 guesses allowed for the codebreaker
-  # string to array method assumes that the peg colours are all uppercase letters
   HINT_COLOURS = %w[Red White].freeze
   # The first colour is for correct colour and position, second one for colour correct but in wrong position
-  # The Code is an array of four peg_colours, as is the guess. Feedback is given as an array of length 4,
-  # starting with the Hint_Colours pegs and completed with nil values
+  # The Code is an array of four peg_colours.
   def point_or_points(num)
     num == 1 ? "1 point" : "#{num} points"
   end
-  # point_or_s makes sure that the singular 'point' is displayed when necessary
+  # point_or_points makes sure that the singular 'point' is displayed when necessary
 end
 
 include GameConstants 
@@ -29,15 +28,15 @@ include GameConstants
 # Human is the class for the human player
 class Human
 
-include GameConstants
+  include GameConstants
 
-    attr_reader :name
+  attr_reader :name
 
-    attr_accessor :codebreaker, :codemaker, :score
+  attr_accessor :codebreaker, :codemaker, :score
 
     def initialize(name)
       @name = name
-      @codebreaker = false
+      @codebreaker = true
       @codemaker = false
       @score = 0
     end
@@ -57,7 +56,8 @@ include GameConstants
 
     # context will determine whether we are asking for a code or guess. The algorithm will ask a Human or 
     # Computer to make a code or guess without knowing which player type is being asked. So if they are asked
-    # the wrong thing, they will return nil
+    # the wrong thing, they will return an empty arrays. 
+    # These array outputs are then concatenated to get the code without knowing who supplied it.
     private 
     
     def make_code_or_guess
@@ -72,30 +72,31 @@ include GameConstants
         array = entered.upcase.scan(REGEX_COLOURS).slice(0,4)
         # returns the first four input characters that match the possible colours
         # which is a valid code for setting a code or a valid guess
-
     end
 end
 
 # Computer is the class for the computer player
 class Computer
   include GameConstants
-   attr_reader :name
+  attr_reader :name
 
-   attr_accessor :codemaker, :codebreaker, :score
+  attr_accessor :codemaker, :codebreaker, :score
    
-   def initialize  
-     @name = 'computer'
-     @codemaker = false
-     @codebreaker = false
-     @score = 0
-   end
+  def initialize  
+    @name = 'computer'
+    @codemaker = true
+    @codebreaker = false
+    @score = 0
+  end
   
+  # to start a new turn/round, the codemaker/codebreaker roles need to be toggled
   def toggle_role
     self.codemaker = !@codemaker
     self.codebreaker = !@codebreaker
   end
   
-  
+  # make_code and make_guess methods return empty array if not role-appropriate.
+  # Concatenation of arrays ends up with correct code or guess after both players have been asked
   def make_code
     self.codemaker ? make_random_code_or_guess : []
   end
@@ -160,8 +161,8 @@ class GameProgress
     def start_new_turn
         self.turn_number += 1
         sleep(2)
-        puts "\n This is the start of Round number #{self.turn_number}." if self.turn_number.between?(2,TURNS - 1)
-        puts "\n And finally, Round number #{TURNS}" if self.turn_number == TURNS
+        puts "\n \nThis is the start of Round number #{self.turn_number}." if self.turn_number.between?(2,TURNS - 1)
+        puts "\n \nAnd finally, Round number #{TURNS}" if self.turn_number == TURNS
     end
 
 end
@@ -236,7 +237,7 @@ end
 computer_player = Computer.new
 puts "Welcome to Mastermind versus the Computer. What is your name?"
 human_player = Human.new(gets.strip)
-puts "In the first round, would you like to make or break the code? Type M for codeMaker or B for codeBreaker."
+puts "In the first round, #{human_player.name}, would you like to make or break the code? Type M for codeMaker or B for codeBreaker."
 THISREGEX = Regexp.union(%w(M B))
 inputted = gets.strip.upcase 
   until inputted.match(THISREGEX)
@@ -244,13 +245,11 @@ inputted = gets.strip.upcase
     inputted = gets.strip.upcase
   end
 decision = inputted.scan(THISREGEX)[0]
+# all role-specifying instance variables initialised to make the Human player the codebreaker
   if decision == 'M'
-human_player.codemaker = true 
-computer_player.codebreaker = true
-  else
-human_player.codebreaker = true 
-computer_player.codemaker = true
-  end
+human_player.toggle_role 
+computer_player.toggle_role
+  end 
 
 # the GameProgress class automatically starts the game_controller.turn_number at 0
 # and this is incremented at the beginning of each turn. Similarly the TurnProgress class
