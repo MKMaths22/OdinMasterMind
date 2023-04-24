@@ -137,6 +137,11 @@ class TurnProgress
   def start_new_guess
     self.guesses_so_far += 1
   end
+
+  def start_new_turn
+    self.code_solved = false
+    self.guesses_so_far = 0
+  end
 end 
 
 # One game consists of an even number of turns, so that both sides set codes and guess codes
@@ -303,8 +308,7 @@ until game_controller.turn_number == TURNS do
     human_player.toggle_role
     computer_player.toggle_role
     feedback_display.reset_the_feedback
-    turn_controller.code_solved = false
-    turn_controller.guesses_so_far = 0
+    turn_controller.start_new_turn
     
 end
 
