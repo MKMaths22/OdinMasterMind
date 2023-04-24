@@ -226,7 +226,7 @@ class FeedbackDisplayer
         guess_string = "Guess: " + guess_array.join(' ')
         stringy_feedback = feedback_array.compact.join(', ')
         if stringy_feedback == ''
-             feedback_string = " feedback: No matches. \n"
+             feedback_string = "  feedback: No matches. \n"
         else feedback_string = "  feedback: #{feedback_array.compact.join(', ')}. \n"
         end 
         guess_string + feedback_string
@@ -281,7 +281,7 @@ until game_controller.turn_number == TURNS do
             turn_controller.code_solved = true
             puts "You solved it. Well done, #{human_player.name}!" if human_player.codebreaker
             puts "The computer solved your code." if computer_player.codebreaker
-            puts "The total feedback for the guesses was: \n #{feedback_display.total_feedback}"
+            puts "The total feedback for the guesses was: \n#{feedback_display.total_feedback}"
             human_player.score += turn_controller.guesses_so_far if human_player.codemaker
             computer_player.score += turn_controller.guesses_so_far if computer_player.codemaker
             puts "The scores are now: #{human_player.name} has #{point_or_points(human_player.score)} and \n
@@ -289,7 +289,7 @@ until game_controller.turn_number == TURNS do
           end 
           break if turn_controller.code_solved 
           # the code was guessed correctly
-          puts "The total feedback so far is: \n #{feedback_display.total_feedback}"
+          puts "The total feedback so far is: \n#{feedback_display.total_feedback}"
     end
     # here is the code that executes if all guesses have been used up in the turn/round
     unless turn_controller.code_solved 
