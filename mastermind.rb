@@ -284,8 +284,7 @@ until game_controller.turn_number == TURNS do
             puts "The total feedback for the guesses was: \n#{feedback_display.total_feedback}"
             human_player.score += turn_controller.guesses_so_far if human_player.codemaker
             computer_player.score += turn_controller.guesses_so_far if computer_player.codemaker
-            puts "The scores are now: #{human_player.name} has #{point_or_points(human_player.score)} and \n
-            the computer has #{point_or_points(computer_player.score)}"
+            puts "The scores are now: \n#{human_player.name} has #{point_or_points(human_player.score)} and \nthe computer has #{point_or_points(computer_player.score)}"
           end 
           break if turn_controller.code_solved 
           # the code was guessed correctly
@@ -300,8 +299,7 @@ until game_controller.turn_number == TURNS do
       else
         computer_player.score += (MAX_GUESSES + 1)
       end
-      puts "The scores are now: #{human_player.name} has #{point_or_points(human_player.score)} and \n
-            the computer has #{point_or_points(computer_player.score)}"
+      puts "The scores are now: \n#{human_player.name} has #{point_or_points(human_player.score)} and \nthe computer has #{point_or_points(computer_player.score)}"
     end
 
     human_player.toggle_role
@@ -311,15 +309,15 @@ until game_controller.turn_number == TURNS do
     
 end
 
-puts "The game is over. Here are the scores..."
+puts "The game is over. Here is the result..."
 sleep(2)
 if human_player.score > computer_player.score
     puts "Congratulations, #{human_player.name}! You won by #{point_or_points(human_player.score)} to #{computer_player.score}."
 elsif human_player.score < computer_player.score
     puts "The computer wins the game by #{point_or_points(computer_player.score)} to #{human_player.score}. \n
-    Better luck next time, #{human_player.name}"
+    Better luck next time, #{human_player.name}."
 else 
-    puts "The game is drawn --- both players scored #{point_or_points(human_player.score)}"
+    puts "The game is drawn --- both players scored #{point_or_points(human_player.score)}."
 end 
 
 
