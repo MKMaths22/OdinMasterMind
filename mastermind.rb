@@ -165,7 +165,12 @@ class Computer
     # filters the remaining possible codes to leave only ones that would give the correct feedback
     # according to the latest guess_array 
     self.remaining_possible_codes = @remaining_possible_codes.filter { |code| feedback(code, guess_array) == feedback_array }
-    puts "There are #{self.remaining_possible_codes.size} possible codes remaining"
+    num_of_codes = self.remaining_possible_codes.size
+    if num_of_codes == 1 
+        puts "There is only one possible code remaining."
+    else 
+        puts "There are #{num_of_codes} possible codes remaining."
+    end 
   end
   
   def make_guess
