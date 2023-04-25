@@ -88,6 +88,22 @@ class Computer
     @codebreaker = false
     @score = 0
   end
+
+  def all_possible_codes
+    number_of_colours = PEG_COLOURS.size
+    number_of_codes = number_of_colours ** 4
+    codes_list = Array.new(number_of_codes) {Array.new(4)}
+    
+    codes_list.each_with_index do |code,index|
+    bignum = index 
+      for i in 0..3 do 
+        remainder = bignum % number_of_colours
+        code[3 - i] = PEG_COLOURS[remainder]
+        bignum = (bignum - remainder)/number_of_colours
+      end 
+    end
+    codes_list
+  end 
   
   # to start a new turn/round, the codemaker/codebreaker roles need to be toggled
   def toggle_role
@@ -102,8 +118,9 @@ class Computer
   end
 
   def make_guess
-    self.codebreaker ? make_random_code_or_guess : []
-    # when the program is rewritten to give Computer a clever strategy, this method will be fleshed out
+    # THIS IS THE CODE FOR RANDOM GUESSES self.codebreaker ? make_random_code_or_guess : []
+    # Now I will give the computer strategy of keeping track of all possible codes and filtering
+    # out anything not consistent with the feedback. We start by listing all possible codes.
   end
 
   private
