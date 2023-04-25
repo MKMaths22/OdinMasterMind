@@ -113,7 +113,8 @@ end
 
 # Computer is the class for the computer player
 class Computer
-  include GameConstants
+  include GameConstants, FeedbackMethods
+  
   attr_reader :name
 
   attr_accessor :codemaker, :codebreaker, :score, :all_codes, :remaining_possible_codes
@@ -124,7 +125,11 @@ class Computer
     @codebreaker = false
     @score = 0
     @all_codes = all_possible_codes
-    @remaining_possible_codes = all_possible_codes
+    @remaining_possible_codes = []
+  end
+
+  def reset_code_list
+    self.remaining_possible_codes = self.all_codes 
   end
 
   def all_possible_codes
@@ -156,9 +161,10 @@ class Computer
     self.codemaker ? make_random_code_or_guess : []
   end
 
-  def reduce_possible_codes(current_possible_codes, guess_array, feedback_array)
-    # the value of remaining_possible_codes would be fed in as current_possible_codes along with a guess
-    # code in array form and the feedback in array form as well.
+  def reduce_possible_codes(guess_array, feedback_array)
+    # filters the remaining possible codes to leave only ones that would give the correct feedback
+    # according to the latest guess_array 
+    self.remaining_possible_codes = @remaining_possible_codes.filter { |code| feedback(code, guess_array) == feedback.array }
   end
   
   def make_guess
@@ -297,7 +303,8 @@ feedback_display = FeedbackDisplayer.new
 
 until game_controller.turn_number == TURNS do
     game_controller.start_new_turn
-    # increments the turn number
+    computer_player.reset_code_list if computer_player.codebreaker
+    # increments the turn number and prepares computer with list of all possible codes if it is codebreaker 
     turn_controller.code = computer_player.make_code.concat(human_player.make_code)
     # whichever player is codebreaker supplies empty array for making code so concat works
 
@@ -308,6 +315,7 @@ until game_controller.turn_number == TURNS do
           current_guess = computer_player.make_guess.concat(human_player.make_guess)
           # current_guess is an array and whichever player is codemaker supplies empty array so concat works
           current_feedback_array = feedback_giver.feedback(turn_controller.code, current_guess)
+          computer_player.reduce_possible_codes(current_guess, current_feedback_array) if computer_player.codebreaker
           current_feedback_string = feedback_display.array_to_string(current_guess, current_feedback_array)
           feedback_display.add_the_feedback(current_feedback_string)
           
