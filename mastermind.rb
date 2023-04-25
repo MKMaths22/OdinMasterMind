@@ -3,7 +3,7 @@
 # Initially I will code the function that gives feedback when a guess is made by the codebreaker
 # The colours will be represented by an array
 module GameConstants 
-  PEG_COLOURS = %w[A B].freeze
+  PEG_COLOURS = %w[A B C D E F].freeze
   # the code does not assume there are six colours, this can be adjusted to any number of single letters
   # make_code_or_guess method in Human class assumes that the peg colours are all uppercase letters
   REGEX_COLOURS = Regexp.union(PEG_COLOURS)
@@ -158,16 +158,20 @@ class Computer
   # make_code and make_guess methods return empty array if not role-appropriate.
   # Concatenation of arrays ends up with correct code or guess after both players have been asked
   def make_code
-    self.codemaker ? make_random_code_or_guess : []
+    self.codemaker ? make_random_code : []
   end
 
   def reduce_possible_codes(guess_array, feedback_array)
     # filters the remaining possible codes to leave only ones that would give the correct feedback
     # according to the latest guess_array 
-    self.remaining_possible_codes = @remaining_possible_codes.filter { |code| feedback(code, guess_array) == feedback.array }
+    self.remaining_possible_codes = @remaining_possible_codes.filter { |code| feedback(code, guess_array) == feedback_array }
   end
   
   def make_guess
+    if self.codebreaker
+        puts "Computer is guessing..."
+        sleep(3)
+    end
     self.codebreaker ? self.remaining_possible_codes.sample : []
     # THIS IS THE CODE FOR RANDOM GUESSES self.codebreaker ? make_random_code_or_guess : []
     # Now I will give the computer strategy of keeping track of all possible codes and filtering
@@ -176,9 +180,8 @@ class Computer
 
   private
 
-  def make_random_code_or_guess
-    puts "computer guessing..." if self.codebreaker
-    puts "computer setting code..." if self.codemaker
+  def make_random_code
+    puts "Computer is setting code..."
     sleep(3)
     # to slow down the computer
     output = []
