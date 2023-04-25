@@ -3,7 +3,7 @@
 # Initially I will code the function that gives feedback when a guess is made by the codebreaker
 # The colours will be represented by an array
 module GameConstants 
-  PEG_COLOURS = %w[A B C D E F].freeze
+  PEG_COLOURS = %w[A B].freeze
   # the code does not assume there are six colours, this can be adjusted to any number of single letters
   # make_code_or_guess method in Human class assumes that the peg colours are all uppercase letters
   REGEX_COLOURS = Regexp.union(PEG_COLOURS)
@@ -20,7 +20,43 @@ module GameConstants
   # point_or_points makes sure that the singular 'point' is displayed when necessary
 end
 
-include GameConstants 
+include GameConstants
+
+# this module can be included in the FeedbackProvider and Computer classes. FeedbackProvider uses these
+# methods to supply feedback arrays to the FeedbackDisplayer to put the feedback to the console. Computer player
+# uses them to check possible codes for its next guess when it is the codebreaker
+module FeedbackMethods
+
+  def exact_matches(array_one, array_two)
+    matches = 0
+    4.times do |i|
+      matches += 1 if array_one[i] == array_two[i]
+    end
+    matches
+  end
+  
+  def total_matches(array_one, array_two)
+    matches = 0
+    PEG_COLOURS.each do |i|
+      matches += [array_one.count(i), array_two.count(i)].min
+    end
+    matches
+  end
+  
+  def feedback(code, guess)
+    output_array = Array.new(4)
+  
+    (1..total_matches(code, guess)).each do |i|
+      output_array[i - 1] = HINT_COLOURS[1]
+    end
+    # so we now have a White peg for every match which may or may not be an exact match
+    (1..exact_matches(code, guess)).each do |i|
+      output_array[i - 1] = HINT_COLOURS[0]
+    end
+    # now we have changed White pegs into Red for each exact match and feedback is complete
+    output_array
+  end
+end
 
 # The overall program will deal with code and guess variables as arrays but the player will input
 # a guess or the code as a string of letters which may be downcase or may/may not have spaces in between
@@ -80,16 +116,19 @@ class Computer
   include GameConstants
   attr_reader :name
 
-  attr_accessor :codemaker, :codebreaker, :score
+  attr_accessor :codemaker, :codebreaker, :score, :all_codes, :remaining_possible_codes
    
   def initialize  
     @name = 'computer'
     @codemaker = true
     @codebreaker = false
     @score = 0
+    @all_codes = all_possible_codes
+    @remaining_possible_codes = all_possible_codes
   end
 
   def all_possible_codes
+    # this method outputs an array of arrays. Each sub array is a possible code of four colours
     number_of_colours = PEG_COLOURS.size
     number_of_codes = number_of_colours ** 4
     codes_list = Array.new(number_of_codes) {Array.new(4)}
@@ -99,10 +138,10 @@ class Computer
       for i in 0..3 do 
         remainder = bignum % number_of_colours
         code[3 - i] = PEG_COLOURS[remainder]
-        bignum = (bignum - remainder)/number_of_colours
+        bignum /= number_of_colours 
       end 
     end
-    codes_list
+    codes_list 
   end 
   
   # to start a new turn/round, the codemaker/codebreaker roles need to be toggled
@@ -117,7 +156,13 @@ class Computer
     self.codemaker ? make_random_code_or_guess : []
   end
 
+  def reduce_possible_codes(current_possible_codes, guess_array, feedback_array)
+    # the value of remaining_possible_codes would be fed in as current_possible_codes along with a guess
+    # code in array form and the feedback in array form as well.
+  end
+  
   def make_guess
+    self.codebreaker ? self.remaining_possible_codes.sample : []
     # THIS IS THE CODE FOR RANDOM GUESSES self.codebreaker ? make_random_code_or_guess : []
     # Now I will give the computer strategy of keeping track of all possible codes and filtering
     # out anything not consistent with the feedback. We start by listing all possible codes.
@@ -188,36 +233,9 @@ end
 class FeedbackProvider
 
     include GameConstants
-    
-    def exact_matches(array_one, array_two)
-        matches = 0
-        4.times do |i|
-          matches += 1 if array_one[i] == array_two[i]
-        end
-        matches
-      end
-      
-      def total_matches(array_one, array_two)
-        matches = 0
-        PEG_COLOURS.each do |i|
-          matches += [array_one.count(i), array_two.count(i)].min
-        end
-        matches
-      end
-      
-      def feedback(code, guess)
-        output_array = Array.new(4)
-      
-        (1..total_matches(code, guess)).each do |i|
-          output_array[i - 1] = HINT_COLOURS[1]
-        end
-        # so we now have a White peg for every match which may or may not be an exact match
-        (1..exact_matches(code, guess)).each do |i|
-          output_array[i - 1] = HINT_COLOURS[0]
-        end
-        # now we have changed White pegs into Red for each exact match and feedback is complete
-        output_array
-      end
+
+    include FeedbackMethods
+
 end
 
 # FeedbackDisplayer class maintains the feedback display for an entire turn based on guesses and
