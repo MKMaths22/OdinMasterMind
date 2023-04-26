@@ -3,7 +3,7 @@
 # Initially I will code the function that gives feedback when a guess is made by the codebreaker
 # The colours will be represented by an array
 module GameConstants 
-  PEG_COLOURS = %w[A B C D E F].freeze
+  PEG_COLOURS = %w[A B C D E F G H I J K L M N O P Q R S T U V W X Y Z].freeze
   # the code does not assume there are six colours, this can be adjusted to any number of single letters
   # make_code_or_guess method in Human class assumes that the peg colours are all uppercase letters
   REGEX_COLOURS = Regexp.union(PEG_COLOURS)
@@ -192,7 +192,7 @@ class Computer
     # to slow down the computer
     output = []
       4.times do
-        output.push(PEG_COLOURS[rand(PEG_COLOURS.size)])
+        output.push(PEG_COLOURS.sample)
       end
       output
   end 
@@ -288,6 +288,8 @@ computer_player = Computer.new
 puts "Welcome to Mastermind versus the Computer. What is your name?"
 human_player = Human.new(gets.strip)
 puts "There are 4 rounds in the game and the codebreaker gets up to 12 guesses in each round."
+puts "Each guess results in feedback that includes #{HINT_COLOURS[0]} for each correct colour that
+is also in the correct position and #{HINT_COLOURS[1]} for colours that are correct but in an incorrect position."
 puts "In the first round, #{human_player.name}, would you like to make or break the code? Type M for codeMaker or B for codeBreaker."
 THISREGEX = Regexp.union(%w(M B))
 inputted = gets.strip.upcase 
@@ -313,7 +315,10 @@ feedback_display = FeedbackDisplayer.new
 
 until game_controller.turn_number == TURNS do
     game_controller.start_new_turn
+    puts "At the start of this new round the computer's role status is: codebreaker: #{computer_player.codebreaker} and codemaker: #{computer_player.codemaker}"
+    puts "Before any reset of code list, the computer has #{computer_player.remaining_possible_codes.size} remaining possible codes"
     computer_player.reset_code_list if computer_player.codebreaker
+    puts "After any reset of the code list, the computer has #{computer_player.remaining_possible_codes.size} remaining possible codes"
     # increments the turn number and prepares computer with list of all possible codes if it is codebreaker 
     turn_controller.code = computer_player.make_code.concat(human_player.make_code)
     # whichever player is codebreaker supplies empty array for making code so concat works
