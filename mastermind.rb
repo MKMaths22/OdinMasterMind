@@ -3,7 +3,7 @@
 # Initially I will code the function that gives feedback when a guess is made by the codebreaker
 # The colours will be represented by an array
 module GameConstants 
-  PEG_COLOURS = %w[A B C D E F G H I J K L M N O P Q R S T U V W X Y Z].freeze
+  PEG_COLOURS = %w[A B C D E F].freeze
   # the code does not assume there are six colours, this can be adjusted to any number of single letters
   # make_code_or_guess method in Human class assumes that the peg colours are all uppercase letters
   REGEX_COLOURS = Regexp.union(PEG_COLOURS)
@@ -129,7 +129,8 @@ class Computer
   end
 
   def reset_code_list
-    self.remaining_possible_codes = self.all_codes 
+    self.remaining_possible_codes = all_possible_codes
+    puts "The code to reset the list has just finished executing" 
   end
 
   def all_possible_codes
