@@ -164,7 +164,7 @@ class Computer
   def reduce_possible_codes(guess_array, feedback_array)
     # filters the remaining possible codes to leave only ones that would give the correct feedback
     # according to the latest guess_array 
-    self.remaining_possible_codes = @remaining_possible_codes.filter { |code| feedback(code, guess_array) == feedback_array }
+    self.remaining_possible_codes.filter! { |code| feedback(code, guess_array) == feedback_array }
     num_of_codes = self.remaining_possible_codes.size
     if num_of_codes == 1 
         puts "There is only one possible code remaining."
