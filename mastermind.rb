@@ -10,7 +10,7 @@ module GameConstants
   MAX_GUESSES = 12
   # the maximum number of guesses in a turn
   TURNS = 4
-  # the number of turns in one game, an even number
+  # the number of turns/rounds in one game, an even number
   HINT_COLOURS = %w[Red White].freeze
   # The first colour is for correct colour and position, second one for colour correct but in wrong position
   # The Code is an array of four peg_colours.
@@ -287,6 +287,7 @@ end
 computer_player = Computer.new
 puts "Welcome to Mastermind versus the Computer. What is your name?"
 human_player = Human.new(gets.strip)
+puts "There are 4 rounds in the game and the codebreaker gets up to 12 guesses in each round."
 puts "In the first round, #{human_player.name}, would you like to make or break the code? Type M for codeMaker or B for codeBreaker."
 THISREGEX = Regexp.union(%w(M B))
 inputted = gets.strip.upcase 
