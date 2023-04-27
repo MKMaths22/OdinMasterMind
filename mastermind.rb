@@ -173,9 +173,9 @@ class Computer
     remaining_possible_codes.filter! { |code| feedback(code, guess_array) == feedback_array }
     num_of_codes = remaining_possible_codes.size
     if num_of_codes == 1
-      puts "Computer knows there is only one possible code remaining.\n"
+      "Computer knows there is only one possible code remaining.\n"
     else
-      puts "Computer deduces there are #{num_of_codes} possible codes remaining.\n"
+      "Computer deduces there are #{num_of_codes} possible codes remaining.\n"
     end
   end
 
@@ -281,11 +281,13 @@ computer_player = Computer.new
 puts 'Welcome to Mastermind versus the Computer. What is your name?'
 human_player = Human.new(gets.strip)
 puts 'There are 4 rounds in the game and the codebreaker gets up to 12 guesses in each round.'
-puts "Each guess results in feedback that includes #{HINT_COLOURS[0]} for each\ 
- correct colour that is also in the correct position and #{HINT_COLOURS[1]} for\ 
- colours that are correct but in an incorrect position."
-puts "In the first round, #{human_player.name}, would you like to make or break\
- the code? Type M for codeMaker or B for codeBreaker."
+first_part = "Each guess results in feedback that includes #{HINT_COLOURS[0]} for each"
+second_part = " correct colour that is also in the correct position and #{HINT_COLOURS[1]} for"
+third_part = " colours that are correct but in an incorrect position."
+puts first_part << second_part << third_part
+first_part = "In the first round, #{human_player.name}, would you like to make or break"
+second_part = " the code? Type M for codeMaker or B for codeBreaker."
+puts first_part << second_part
 
 THISREGEX = Regexp.union(%w[M B])
 inputted = gets.strip.upcase
@@ -326,10 +328,11 @@ until game_controller.turn_number == TURNS
     # current_guess is an array and whichever player is codemaker supplies empty array so concat works
 
     current_feedback_array = feedback_giver.feedback(turn_controller.code, current_guess)
-    computer_player.reduce_possible_codes(current_guess, current_feedback_array) if computer_player.codebreaker
     current_feedback_string = feedback_display.array_to_string(current_guess, current_feedback_array)
     feedback_display.add_the_feedback(current_feedback_string)
-
+    if computer_player.codebreaker
+      puts computer_player.reduce_possible_codes(current_guess, current_feedback_array)
+    end
     if current_feedback_array[3] == HINT_COLOURS[0]
       turn_controller.code_solved = true
       puts "You solved it. Well done, #{human_player.name}!" if human_player.codebreaker
@@ -348,8 +351,9 @@ until game_controller.turn_number == TURNS
 
   # here is the code that executes if all guesses have been used up in the turn/round
   unless turn_controller.code_solved
-    puts "The code #{turn_controller.code} has not been cracked in #{MAX_GUESSES} guesses,\
- so the codemaker scores #{MAX_GUESSES + 1} points."
+    first_part = "The code #{turn_controller.code} has not been cracked in #{MAX_GUESSES} guesses,"
+    second_part = " so the codemaker scores #{MAX_GUESSES + 1} points."
+    puts first_part << second_part
     if human_player.codemaker
       human_player.score += (MAX_GUESSES + 1)
       puts "That's a good round, #{human_player.name}."
