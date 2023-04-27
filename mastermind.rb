@@ -282,7 +282,7 @@ puts 'Welcome to Mastermind versus the Computer. What is your name?'
 human_player = Human.new(gets.strip)
 puts 'There are 4 rounds in the game and the codebreaker gets up to 12 guesses in each round.'
 first_part = "Each guess results in feedback that includes #{HINT_COLOURS[0]} for each"
-second_part = " correct colour that is also in the correct position and #{HINT_COLOURS[1]} for"
+second_part = " correct colour that is also in the correct position \nand #{HINT_COLOURS[1]} for"
 third_part = " colours that are correct but in an incorrect position."
 puts first_part << second_part << third_part
 first_part = "In the first round, #{human_player.name}, would you like to make or break"
@@ -330,9 +330,7 @@ until game_controller.turn_number == TURNS
     current_feedback_array = feedback_giver.feedback(turn_controller.code, current_guess)
     current_feedback_string = feedback_display.array_to_string(current_guess, current_feedback_array)
     feedback_display.add_the_feedback(current_feedback_string)
-    if computer_player.codebreaker
-      puts computer_player.reduce_possible_codes(current_guess, current_feedback_array)
-    end
+    
     if current_feedback_array[3] == HINT_COLOURS[0]
       turn_controller.code_solved = true
       puts "You solved it. Well done, #{human_player.name}!" if human_player.codebreaker
@@ -346,7 +344,12 @@ until game_controller.turn_number == TURNS
     break if turn_controller.code_solved
 
     # the code was guessed correctly
+    
     puts "The total feedback so far is: \n#{feedback_display.total_feedback}"
+    if computer_player.codebreaker
+      puts computer_player.reduce_possible_codes(current_guess, current_feedback_array)
+      # computer reduces its list of possible codes and announces how many remain
+    end
   end
 
   # here is the code that executes if all guesses have been used up in the turn/round
