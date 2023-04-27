@@ -25,6 +25,15 @@ module GameConstants
 
 end
 
+module ToggleRole
+    # to start a new turn/round, the codemaker/codebreaker roles need to be toggled.
+    # This method is available to the Human and Computer classes.
+    def toggle_role
+      self.codemaker = !@codemaker
+      self.codebreaker = !@codebreaker
+    end
+end
+
 include GameConstants
 
 # FeedbackMethods module is included in the FeedbackProvider and Computer classes. FeedbackProvider uses these
@@ -71,7 +80,7 @@ end
 # Human is the class for the human player
 class Human
 
-  include GameConstants
+  include GameConstants, ToggleRole
 
   attr_reader :name
 
@@ -84,30 +93,26 @@ class Human
       @score = 0
     end
 
-    def toggle_role
-        self.codemaker = !@codemaker
-        self.codebreaker = !@codebreaker
-    end
-
     def make_code
-        self.codemaker ? make_code_or_guess : [] 
+        self.codemaker ? make_code_or_guess : []
     end
 
-    def make_guess 
+    def make_guess
         self.codebreaker ? make_code_or_guess : []
-    end 
+    end
 
     # context will determine whether we are asking for a code or guess. The algorithm will ask a Human or 
     # Computer to make a code or guess without knowing which player type is being asked. So if they are asked
-    # the wrong thing, they will return an empty arrays. 
+    # the wrong thing, they will return an empty array.
     # These array outputs are then concatenated to get the code without knowing who supplied it.
+
     private 
-    
+
     def make_code_or_guess
-        puts "Let's hope the computer can't crack this." if self.codemaker
+        puts "Let's hope the computer can't crack this code." if self.codemaker
         puts "Guess the code." if self.codebreaker
         puts "Enter four colours from #{PEG_COLOURS}. Duplicates allowed."
-        entered = gets 
+        entered = gets
           until entered.upcase.scan(REGEX_COLOURS).size >= 4
             puts "Not accepted. Please type four colour characters, choosing from #{PEG_COLOURS}. Duplicates allowed."
             entered = gets
@@ -120,13 +125,13 @@ end
 
 # Computer is the class for the computer player
 class Computer
-  include GameConstants, FeedbackMethods
-  
+  include GameConstants, FeedbackMethods, ToggleRole
+
   attr_reader :name
 
   attr_accessor :codemaker, :codebreaker, :score, :all_codes, :remaining_possible_codes
-   
-  def initialize  
+
+  def initialize
     @name = 'computer'
     @codemaker = true
     @codebreaker = false
@@ -135,9 +140,10 @@ class Computer
     @remaining_possible_codes = []
   end
 
+  # at the start of a new turn/round, the computer player knows that all codes are possible
   def reset_code_list
     self.remaining_possible_codes = all_possible_codes
-    puts "The code to reset the list has just finished executing" 
+    # puts "The code to reset the list has just finished executing" 
   end
 
   def all_possible_codes
@@ -145,24 +151,19 @@ class Computer
     number_of_colours = PEG_COLOURS.size
     number_of_codes = number_of_colours ** 4
     codes_list = Array.new(number_of_codes) {Array.new(4)}
-    
+
     codes_list.each_with_index do |code,index|
-    bignum = index 
-      for i in 0..3 do 
+    bignum = index
+      for i in 0..3 do
         remainder = bignum % number_of_colours
         code[3 - i] = PEG_COLOURS[remainder]
-        bignum /= number_of_colours 
-      end 
+        bignum /= number_of_colours
+      end
     end
-    codes_list 
-  end 
-  
-  # to start a new turn/round, the codemaker/codebreaker roles need to be toggled
-  def toggle_role
-    self.codemaker = !@codemaker
-    self.codebreaker = !@codebreaker
+    codes_list
   end
-  
+
+
   # make_code and make_guess methods return empty array if not role-appropriate.
   # Concatenation of arrays ends up with correct code or guess after both players have been asked
   def make_code
