@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module GameConstants 
+module GameConstants
   PEG_COLOURS = %w[A B C D E F].freeze
   # the code does not assume there are six colours, this can be adjusted to any number of single letters
   # REGEX_COLOURS helps with matching the Human player's input against the colours in the
@@ -13,7 +13,7 @@ module GameConstants
   HINT_COLOURS = %w[Red White].freeze
   # The first colour is for correct colour and position, second one for colour correct but in wrong position
   # The Code is an array of four peg_colours.
-  
+
   def point_or_points(num)
     num == 1 ? "1 point" : "#{num} points"
   end
@@ -27,9 +27,9 @@ end
 
 include GameConstants
 
-# this module can be included in the FeedbackProvider and Computer classes. FeedbackProvider uses these
+# FeedbackMethods module is included in the FeedbackProvider and Computer classes. FeedbackProvider uses these
 # methods to supply feedback arrays to the FeedbackDisplayer to put the feedback to the console. Computer player
-# uses them to check possible codes for its next guess when it is the codebreaker
+# uses them to check possible codes for its next guess when it is the codebreaker.
 module FeedbackMethods
 
   def exact_matches(array_one, array_two)
@@ -39,7 +39,7 @@ module FeedbackMethods
     end
     matches
   end
-  
+
   def total_matches(array_one, array_two)
     matches = 0
     PEG_COLOURS.each do |i|
@@ -47,18 +47,20 @@ module FeedbackMethods
     end
     matches
   end
-  
+
   def feedback(code, guess)
     output_array = Array.new(4)
-  
+
     (1..total_matches(code, guess)).each do |i|
       output_array[i - 1] = HINT_COLOURS[1]
     end
     # so we now have a White peg for every match which may or may not be an exact match
+
     (1..exact_matches(code, guess)).each do |i|
       output_array[i - 1] = HINT_COLOURS[0]
     end
     # now we have changed White pegs into Red for each exact match and feedback is complete
+
     output_array
   end
 end
