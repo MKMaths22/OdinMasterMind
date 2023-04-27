@@ -106,7 +106,7 @@ class Human
     # the wrong thing, they will return an empty array.
     # These array outputs are then concatenated to get the code without knowing who supplied it.
 
-    private 
+    private
 
     def make_code_or_guess
         puts "Let's hope the computer can't crack this code." if self.codemaker
@@ -143,7 +143,6 @@ class Computer
   # at the start of a new turn/round, the computer player knows that all codes are possible
   def reset_code_list
     self.remaining_possible_codes = all_possible_codes
-    # puts "The code to reset the list has just finished executing" 
   end
 
   def all_possible_codes
@@ -163,7 +162,6 @@ class Computer
     codes_list
   end
 
-
   # make_code and make_guess methods return empty array if not role-appropriate.
   # Concatenation of arrays ends up with correct code or guess after both players have been asked
   def make_code
@@ -175,22 +173,20 @@ class Computer
     # according to the latest guess_array 
     self.remaining_possible_codes.filter! { |code| feedback(code, guess_array) == feedback_array }
     num_of_codes = self.remaining_possible_codes.size
-    if num_of_codes == 1 
-        puts "There is only one possible code remaining."
-    else 
-        puts "There are #{num_of_codes} possible codes remaining."
-    end 
+    if num_of_codes == 1
+        puts "Computer knows there is only one possible code remaining.\n"
+    else
+        puts "Computer deduces there are #{num_of_codes} possible codes remaining.\n"
+    end
   end
-  
+
   def make_guess
     if self.codebreaker
         puts "Computer is guessing..."
         sleep(3)
     end
     self.codebreaker ? self.remaining_possible_codes.sample : []
-    # THIS IS THE CODE FOR RANDOM GUESSES self.codebreaker ? make_random_code_or_guess : []
-    # Now I will give the computer strategy of keeping track of all possible codes and filtering
-    # out anything not consistent with the feedback. We start by listing all possible codes.
+    # The computer chooses a code at random from the remaining possibilities
   end
 
   private
@@ -210,17 +206,17 @@ end
 
 # TurnProgress class keeps track of how many guesses so far in the turn and knows when it is over
 class TurnProgress
-    
+  
   include GameConstants
 
   attr_accessor :code, :guesses_so_far, :code_solved
-  
+
   def initialize
     @code = nil
     @guesses_so_far = 0
     @code_solved = false
   end
-  
+
   def start_new_guess
     self.guesses_so_far += 1
   end
@@ -229,79 +225,81 @@ class TurnProgress
     self.code_solved = false
     self.guesses_so_far = 0
   end
-end 
+end
 
-# One game consists of an even number of turns, so that both sides set codes and guess codes
-# equally many times. GameProgress class keeps track of how many turns and knows when it is over
+# One game consists of an even number of turns/rounds, so that both sides set codes and guess codes
+# equally many times. GameProgress class keeps track of how many turns/rounds and knows when it is over.
 class GameProgress
 
-    include GameConstants
+  include GameConstants
 
-    attr_accessor :turn_number
-    
-    def initialize
-      @turn_number = 0
-      # starts at zero so that at the start of a turn it is the number of completed turns/rounds
-    end 
+  attr_accessor :turn_number
 
-    def start_new_turn
-        self.turn_number += 1
-        sleep(2)
-        puts "\n \nThis is the start of Round number #{self.turn_number}." if self.turn_number.between?(2,TURNS - 1)
-        puts "\n \nAnd finally, Round number #{TURNS}" if self.turn_number == TURNS
-    end
+  def initialize
+    @turn_number = 0
+    # starts at zero so that at the start of a turn it is the number of completed turns/rounds
+  end
+
+  def start_new_turn
+    self.turn_number += 1
+    sleep(2)
+    puts "\n \nThis is the start of Round number #{self.turn_number}." if self.turn_number.between?(2,TURNS - 1)
+    puts "\n \nAnd finally, Round number #{TURNS}" if self.turn_number == TURNS
+  end
 
 end
 
 # FeedbackProvider class can accept a guess and code and give the feedback for that one case
 class FeedbackProvider
 
-    include GameConstants
+  include GameConstants
 
-    include FeedbackMethods
+  include FeedbackMethods
 
 end
 
 # FeedbackDisplayer class maintains the feedback display for an entire turn based on guesses and
-# feedback so far, so we can see the whole history of trying to crack the code
+# feedback so far, so we can see the whole history of trying to crack the code.
 class FeedbackDisplayer
-    
-    attr_accessor :total_feedback
-    
-    def initialize
-        @total_feedback = ""
-        #tracks the total feedback so far in the current turn/round as a string
-    end
 
-    def add_the_feedback(one_guess_output)
-        self.total_feedback += one_guess_output
-    end
+  attr_accessor :total_feedback
 
-    def reset_the_feedback
-        self.total_feedback = ""
-    end
+  def initialize
+    @total_feedback = ""
+    #tracks the total feedback so far in the current turn/round as a string
+  end
 
-    def array_to_string(guess_array,feedback_array)
-        # format for output after a guess: puts [ 'Guess: A B C D  feedback: Red, White.']
-        guess_string = "Guess: " + guess_array.join(' ')
-        stringy_feedback = feedback_array.compact.join(', ')
-        if stringy_feedback == ''
-             feedback_string = "  feedback: No matches. \n"
-        else feedback_string = "  feedback: #{feedback_array.compact.join(', ')}. \n"
-        end 
-        guess_string + feedback_string
-    end
+  def add_the_feedback(one_guess_output)
+    self.total_feedback += one_guess_output
+  end
+
+  def reset_the_feedback
+    self.total_feedback = ""
+  end
+
+  def array_to_string(guess_array,feedback_array)
+    # format for output after a guess: puts [ 'Guess: A B C D  feedback: Red, White.']
+    guess_string = "Guess: " + guess_array.join(' ')
+    stringy_feedback = feedback_array.compact.join(', ')
+
+      if stringy_feedback == ''
+        feedback_string = "  feedback: No matches. \n"
+      else feedback_string = "  feedback: #{feedback_array.compact.join(', ')}. \n"
+      end
+    guess_string + feedback_string
+  end
 end
 
 computer_player = Computer.new
 puts "Welcome to Mastermind versus the Computer. What is your name?"
 human_player = Human.new(gets.strip)
 puts "There are 4 rounds in the game and the codebreaker gets up to 12 guesses in each round."
-puts "Each guess results in feedback that includes #{HINT_COLOURS[0]} for each correct colour that
-is also in the correct position and #{HINT_COLOURS[1]} for colours that are correct but in an incorrect position."
+puts "Each guess results in feedback that includes #{HINT_COLOURS[0]} for each correct colour that" 
+<< "is also in the correct position and #{HINT_COLOURS[1]} for colours that are correct but in an incorrect position."
 puts "In the first round, #{human_player.name}, would you like to make or break the code? Type M for codeMaker or B for codeBreaker."
+
 THISREGEX = Regexp.union(%w(M B))
-inputted = gets.strip.upcase 
+inputted = gets.strip.upcase
   until inputted.match(THISREGEX)
     puts "Please type M or B to continue."
     inputted = gets.strip.upcase
@@ -309,9 +307,9 @@ inputted = gets.strip.upcase
 decision = inputted.scan(THISREGEX)[0]
 # all role-specifying instance variables initialised to make the Human player the codebreaker
   if decision == 'M'
-human_player.toggle_role 
-computer_player.toggle_role
-  end 
+    human_player.toggle_role
+    computer_player.toggle_role
+  end
 
 # the GameProgress class automatically starts the game_controller.turn_number at 0
 # and this is incremented at the beginning of each turn. Similarly the TurnProgress class
@@ -321,14 +319,11 @@ turn_controller = TurnProgress.new
 feedback_giver = FeedbackProvider.new
 feedback_display = FeedbackDisplayer.new
 
-
 until game_controller.turn_number == TURNS do
     game_controller.start_new_turn
-    puts "At the start of this new round the computer's role status is: codebreaker: #{computer_player.codebreaker} and codemaker: #{computer_player.codemaker}"
-    puts "Before any reset of code list, the computer has #{computer_player.remaining_possible_codes.size} remaining possible codes"
     computer_player.reset_code_list if computer_player.codebreaker
-    puts "After any reset of the code list, the computer has #{computer_player.remaining_possible_codes.size} remaining possible codes"
     # increments the turn number and prepares computer with list of all possible codes if it is codebreaker 
+    
     turn_controller.code = computer_player.make_code.concat(human_player.make_code)
     # whichever player is codebreaker supplies empty array for making code so concat works
 
@@ -338,11 +333,12 @@ until game_controller.turn_number == TURNS do
           puts "Last guess now. Good luck!" if human_player.codebreaker && turn_controller.guesses_so_far == MAX_GUESSES
           current_guess = computer_player.make_guess.concat(human_player.make_guess)
           # current_guess is an array and whichever player is codemaker supplies empty array so concat works
+          
           current_feedback_array = feedback_giver.feedback(turn_controller.code, current_guess)
           computer_player.reduce_possible_codes(current_guess, current_feedback_array) if computer_player.codebreaker
           current_feedback_string = feedback_display.array_to_string(current_guess, current_feedback_array)
           feedback_display.add_the_feedback(current_feedback_string)
-          
+
           if current_feedback_array[3] == HINT_COLOURS[0]
             turn_controller.code_solved = true
             puts "You solved it. Well done, #{human_player.name}!" if human_player.codebreaker
@@ -351,13 +347,15 @@ until game_controller.turn_number == TURNS do
             human_player.score += turn_controller.guesses_so_far if human_player.codemaker
             computer_player.score += turn_controller.guesses_so_far if computer_player.codemaker
             puts announce_scores(human_player.name, human_player.score, computer_player.score)
-          end 
-          break if turn_controller.code_solved 
+          end
+          
+          break if turn_controller.code_solved
           # the code was guessed correctly
           puts "The total feedback so far is: \n#{feedback_display.total_feedback}"
     end
+    
     # here is the code that executes if all guesses have been used up in the turn/round
-    unless turn_controller.code_solved 
+    unless turn_controller.code_solved
       puts "The code #{turn_controller.code} has not been cracked in #{MAX_GUESSES} guesses, so the codemaker scores #{MAX_GUESSES + 1} points."
       if human_player.codemaker
         human_player.score += (MAX_GUESSES + 1)
@@ -372,7 +370,7 @@ until game_controller.turn_number == TURNS do
     computer_player.toggle_role
     feedback_display.reset_the_feedback
     turn_controller.start_new_turn
-    
+  
 end
 
 puts "The game is over. Here is the result..."
@@ -380,18 +378,8 @@ sleep(2)
 if human_player.score > computer_player.score
     puts "Congratulations, #{human_player.name}! You won by #{point_or_points(human_player.score)} to #{computer_player.score}."
 elsif human_player.score < computer_player.score
-    puts "The computer wins the game by #{point_or_points(computer_player.score)} to #{human_player.score}. \n
-    Better luck next time, #{human_player.name}."
-else 
+    puts "The computer wins the game by #{point_or_points(computer_player.score)} to #{human_player.score}."
+    << "Better luck next time, #{human_player.name}."
+else
     puts "The game is drawn --- both players scored #{point_or_points(human_player.score)}."
-end 
-
-
-
-
-
-
-
-  
-
-
+end
