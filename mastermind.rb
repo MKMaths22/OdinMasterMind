@@ -1,23 +1,28 @@
 # frozen_string_literal: true
 
-# Initially I will code the function that gives feedback when a guess is made by the codebreaker
-# The colours will be represented by an array
 module GameConstants 
   PEG_COLOURS = %w[A B C D E F].freeze
   # the code does not assume there are six colours, this can be adjusted to any number of single letters
-  # make_code_or_guess method in Human class assumes that the peg colours are all uppercase letters
+  # REGEX_COLOURS helps with matching the Human player's input against the colours in the
+  # make_code_or_guess method, which assumes the peg colours are distinct uppercase letters
   REGEX_COLOURS = Regexp.union(PEG_COLOURS)
   MAX_GUESSES = 12
-  # the maximum number of guesses in a turn
+  # the maximum number of guesses in a turn/round
   TURNS = 4
   # the number of turns/rounds in one game, an even number
   HINT_COLOURS = %w[Red White].freeze
   # The first colour is for correct colour and position, second one for colour correct but in wrong position
   # The Code is an array of four peg_colours.
+  
   def point_or_points(num)
     num == 1 ? "1 point" : "#{num} points"
   end
-  # point_or_points makes sure that the singular 'point' is displayed when necessary
+  # point_or_points makes sure that the singular 'point' is displayed when necessary for outputting the scores
+
+  def announce_scores(human_name, human_score, computer_score)
+    "The scores are now: \n#{human_name} has #{point_or_points(human_score)} and \nthe computer has #{point_or_points(computer_score)}"
+  end
+
 end
 
 include GameConstants
@@ -342,7 +347,7 @@ until game_controller.turn_number == TURNS do
             puts "The total feedback for the guesses was: \n#{feedback_display.total_feedback}"
             human_player.score += turn_controller.guesses_so_far if human_player.codemaker
             computer_player.score += turn_controller.guesses_so_far if computer_player.codemaker
-            puts "The scores are now: \n#{human_player.name} has #{point_or_points(human_player.score)} and \nthe computer has #{point_or_points(computer_player.score)}"
+            puts announce_scores(human_player.name, human_player.score, computer_player.score)
           end 
           break if turn_controller.code_solved 
           # the code was guessed correctly
@@ -357,7 +362,7 @@ until game_controller.turn_number == TURNS do
       else
         computer_player.score += (MAX_GUESSES + 1)
       end
-      puts "The scores are now: \n#{human_player.name} has #{point_or_points(human_player.score)} and \nthe computer has #{point_or_points(computer_player.score)}"
+      puts announce_scores(human_player.name, human_player.score, computer_player.score)
     end
 
     human_player.toggle_role
