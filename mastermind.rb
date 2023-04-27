@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-# GameConstants module defines the colours of code/hint pegs, number of turns/rounds, and score announcing methods
-# module GameConstants
 PEG_COLOURS = %w[A B C D E F].freeze
 # the code does not assume there are six colours, this can be adjusted to any number of single letters
 # REGEX_COLOURS helps with matching the Human player's input against the colours in the
@@ -21,7 +19,8 @@ end
 # point_or_points makes sure that the singular 'point' is displayed when necessary for outputting the scores
 
 def announce_scores(human_name, human_score, computer_score)
-  "The scores are now: \n#{human_name} has #{point_or_points(human_score)} and \nthe computer has #{point_or_points(computer_score)}"
+  "The scores are now: \n#{human_name} has #{point_or_points(human_score)} and \nthe\
+ computer has #{point_or_points(computer_score)}"
 end
 # end
 
@@ -111,7 +110,8 @@ class Human
     entered = gets
 
     until entered.upcase.scan(REGEX_COLOURS).size >= 4
-      puts "Not accepted. Please type four colour characters, choosing from #{PEG_COLOURS}. Duplicates allowed."
+      puts "Not accepted. Please type four colour characters, choosing from #{PEG_COLOURS}.\
+     Duplicates allowed."
       entered = gets
     end
 
@@ -281,8 +281,11 @@ computer_player = Computer.new
 puts 'Welcome to Mastermind versus the Computer. What is your name?'
 human_player = Human.new(gets.strip)
 puts 'There are 4 rounds in the game and the codebreaker gets up to 12 guesses in each round.'
-puts "Each guess results in feedback that includes #{HINT_COLOURS[0]} for each correct colour that is also in the correct position and #{HINT_COLOURS[1]} for colours that are correct but in an incorrect position."
-puts "In the first round, #{human_player.name}, would you like to make or break the code? Type M for codeMaker or B for codeBreaker."
+puts "Each guess results in feedback that includes #{HINT_COLOURS[0]} for each\ 
+ correct colour that is also in the correct position and #{HINT_COLOURS[1]} for\ 
+ colours that are correct but in an incorrect position."
+puts "In the first round, #{human_player.name}, would you like to make or break\
+ the code? Type M for codeMaker or B for codeBreaker."
 
 THISREGEX = Regexp.union(%w[M B])
 inputted = gets.strip.upcase
@@ -316,7 +319,9 @@ until game_controller.turn_number == TURNS
   until turn_controller.guesses_so_far == MAX_GUESSES
     turn_controller.start_new_guess
     # increments the guesses_so_far number
-    puts 'Last guess now. Good luck!' if human_player.codebreaker && turn_controller.guesses_so_far == MAX_GUESSES
+    if human_player.codebreaker && turn_controller.guesses_so_far == MAX_GUESSES
+      puts 'Last guess now. Good luck!'
+    end
     current_guess = computer_player.make_guess.concat(human_player.make_guess)
     # current_guess is an array and whichever player is codemaker supplies empty array so concat works
 
@@ -343,7 +348,8 @@ until game_controller.turn_number == TURNS
 
   # here is the code that executes if all guesses have been used up in the turn/round
   unless turn_controller.code_solved
-    puts "The code #{turn_controller.code} has not been cracked in #{MAX_GUESSES} guesses, so the codemaker scores #{MAX_GUESSES + 1} points."
+    puts "The code #{turn_controller.code} has not been cracked in #{MAX_GUESSES} guesses,\
+ so the codemaker scores #{MAX_GUESSES + 1} points."
     if human_player.codemaker
       human_player.score += (MAX_GUESSES + 1)
       puts "That's a good round, #{human_player.name}."
@@ -363,9 +369,11 @@ end
 puts 'The game is over. Here is the result...'
 sleep(2)
 if human_player.score > computer_player.score
-  puts "Congratulations, #{human_player.name}! You won by #{point_or_points(human_player.score)} to #{computer_player.score}."
+  puts "Congratulations, #{human_player.name}! You won by #{point_or_points(human_player.score)}\
+ to #{computer_player.score}."
 elsif human_player.score < computer_player.score
-  puts "The computer wins the game by #{point_or_points(computer_player.score)} to #{human_player.score}. Better luck next time, #{human_player.name}."
+  puts "The computer wins the game by #{point_or_points(computer_player.score)} to\
+ #{human_player.score}. Better luck next time, #{human_player.name}."
 else
   puts "The game is drawn --- both players scored #{point_or_points(human_player.score)}."
 end
