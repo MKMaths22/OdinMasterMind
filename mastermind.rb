@@ -115,8 +115,8 @@ class Human
       entered = gets
     end
 
-    array = entered.upcase.scan(REGEX_COLOURS).slice(0, 4)
-    # returns the first four input characters that match the possible colours
+    entered.upcase.scan(REGEX_COLOURS).slice(0, 4)
+    # returns the first four input characters that match the possible colours as an array
     # which is a valid code for setting a code or a valid guess
   end
 end
@@ -283,10 +283,10 @@ human_player = Human.new(gets.strip)
 puts 'There are 4 rounds in the game and the codebreaker gets up to 12 guesses in each round.'
 first_part = "Each guess results in feedback that includes #{HINT_COLOURS[0]} for each"
 second_part = " correct colour that is also in the correct position \nand #{HINT_COLOURS[1]} for"
-third_part = " colours that are correct but in an incorrect position."
+third_part = ' colours that are correct but in an incorrect position.'
 puts first_part << second_part << third_part
 first_part = "In the first round, #{human_player.name}, would you like to make or break"
-second_part = " the code? Type M for codeMaker or B for codeBreaker."
+second_part = ' the code? Type M for codeMaker or B for codeBreaker.'
 puts first_part << second_part
 
 THISREGEX = Regexp.union(%w[M B])
@@ -321,16 +321,14 @@ until game_controller.turn_number == TURNS
   until turn_controller.guesses_so_far == MAX_GUESSES
     turn_controller.start_new_guess
     # increments the guesses_so_far number
-    if human_player.codebreaker && turn_controller.guesses_so_far == MAX_GUESSES
-      puts 'Last guess now. Good luck!'
-    end
+    puts 'Last guess now. Good luck!' if human_player.codebreaker && turn_controller.guesses_so_far == MAX_GUESSES
     current_guess = computer_player.make_guess.concat(human_player.make_guess)
     # current_guess is an array and whichever player is codemaker supplies empty array so concat works
 
     current_feedback_array = feedback_giver.feedback(turn_controller.code, current_guess)
     current_feedback_string = feedback_display.array_to_string(current_guess, current_feedback_array)
     feedback_display.add_the_feedback(current_feedback_string)
-    
+
     if current_feedback_array[3] == HINT_COLOURS[0]
       turn_controller.code_solved = true
       puts "You solved it. Well done, #{human_player.name}!" if human_player.codebreaker
@@ -344,7 +342,7 @@ until game_controller.turn_number == TURNS
     break if turn_controller.code_solved
 
     # the code was guessed correctly
-    
+
     puts "The total feedback so far is: \n#{feedback_display.total_feedback}"
     if computer_player.codebreaker
       puts computer_player.reduce_possible_codes(current_guess, current_feedback_array)
